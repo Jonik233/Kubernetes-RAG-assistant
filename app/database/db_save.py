@@ -1,5 +1,5 @@
 from datetime import datetime
-from deployment.db_init import get_db_connection, DB_TIMEZONE
+from app.database.db_init import get_db_connection, DB_TIMEZONE
 
 
 def save_feedback(conversation_id, source, relevance=None,

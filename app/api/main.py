@@ -4,7 +4,7 @@ from fastapi import BackgroundTasks
 
 from app.rag.rag import create_assistant
 from app.evaluation.online_judge import evaluate_relevance
-from deployment.db_save import save_conversation, save_feedback
+from app.database.db_save import save_conversation, save_feedback
 
 
 app = FastAPI()

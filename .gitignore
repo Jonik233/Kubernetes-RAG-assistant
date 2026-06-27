@@ -5,3 +5,5 @@ scripts/.env
 ingestion/.env
 deployment/.env
 app/rag/.env
+__pycache__/
+*.pyc

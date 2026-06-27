@@ -7,10 +7,10 @@ load_dotenv()
 
 
 DB_CONN_INFO = (
-    f"host={os.getenv('DB_HOST', 'localhost')}"
-    f"dbname={os.getenv('DB_NAME', 'rag-database')}"
-    f"user={os.getenv('DB_USER', 'user')}"
-    f"port={os.getenv('DB_PORT', '5432')}"
+    f"host={os.getenv('DB_HOST', 'localhost')} "
+    f"dbname={os.getenv('DB_NAME', 'rag-database')} "
+    f"user={os.getenv('DB_USER', 'user')} "
+    f"port={os.getenv('DB_PORT', '5432')} "
     f"password={os.getenv('DB_PASSWORD', 'password')}"
 )
 

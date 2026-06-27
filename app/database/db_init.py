@@ -1,7 +1,6 @@
-import os
-import psycopg
 from datetime import datetime
 from dotenv import load_dotenv
+from app.database.db_pool import get_db_connection
 
 load_dotenv()
 
@@ -10,19 +9,9 @@ DB_TIMEZONE = datetime.now().astimezone().tzinfo
 print(f"Using timezone: {DB_TIMEZONE}")
 
 
-def get_db_connection():
-    return psycopg.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        dbname=os.getenv("DB_NAME", "rag-database"),
-        user=os.getenv("DB_USER", "user"),
-        port=os.getenv("DB_PORT", "5432"),
-        password=os.getenv("DB_PASSWORD", "password")
-    )
-
-
 def init_db(drop=False):
-    conn = get_db_connection()
-    try:
+
+    with get_db_connection() as conn:
         with conn.cursor() as cur:
             if drop:
                 cur.execute("DROP TABLE IF EXISTS conversations")
@@ -42,9 +31,6 @@ def init_db(drop=False):
                     timestamp TIMESTAMP WITH TIME ZONE NOT NULL
                 )
             """)
-        conn.commit()
-    finally:
-        conn.close()
 
 
 def init_feedback():
@@ -54,8 +40,7 @@ def init_feedback():
     relevance and explanation: will be used later by the built-in judge
     """
 
-    conn = get_db_connection()
-    try:
+    with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("DROP TABLE IF EXISTS feedback")
 
@@ -70,11 +55,3 @@ def init_feedback():
                     timestamp TIMESTAMP WITH TIME ZONE NOT NULL
                 )
             """)
-        conn.commit()
-    finally:
-        conn.close()
-
-
-if __name__ == "__main__":
-    init_db()
-    init_feedback()

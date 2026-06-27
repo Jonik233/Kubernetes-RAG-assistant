@@ -1,36 +1,29 @@
 from datetime import datetime
-from app.database.db_init import get_db_connection, DB_TIMEZONE
+from app.database.db_init import DB_TIMEZONE
+from app.database.db_pool import get_db_connection
 
 
-def save_feedback(conversation_id, source, relevance=None,
-                  explanation=None, score=None):
+def save_feedback(conversation_id, source, relevance=None, explanation=None, score=None):
     timestamp = datetime.now(DB_TIMEZONE)
 
-    conn = get_db_connection()
-    try:
+    with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
                 """
                 INSERT INTO feedback (
-                    conversation_id, source, relevance,
-                    explanation, score, timestamp
+                    conversation_id, source, relevance, explanation, score, timestamp
                 ) VALUES (
                     %s, %s, %s, %s, %s, %s
                 )
                 """,
-                (conversation_id, source, relevance,
-                 explanation, score, timestamp),
+                (conversation_id, source, relevance, explanation, score, timestamp)
             )
-        conn.commit()
-    finally:
-        conn.close()
 
 
 def save_conversation(record, question):
     timestamp = datetime.now(DB_TIMEZONE)
 
-    conn = get_db_connection()
-    try:
+    with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
                 """
@@ -57,7 +50,4 @@ def save_conversation(record, question):
                 ),
             )
             conversation_id = cur.fetchone()[0]
-        conn.commit()
-    finally:
-        conn.close()
-    return conversation_id
+            return conversation_id

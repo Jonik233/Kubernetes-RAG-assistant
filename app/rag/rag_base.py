@@ -1,7 +1,5 @@
 import time
-from openai import OpenAI
 from app.core.config import PROMPT_TEMPLATE
-from app.rag.rag_utils import load_docs, build_index
 from app.evaluation.metrics import LLMCallRecord, calculate_cost
 
 
@@ -64,22 +62,24 @@ class RAGBase:
     def rag(self, query):
         search_results = self.search(query)
         prompt = self.build_prompt(query, search_results)
-        answer = self.llm(prompt)
-        return answer
+        answer, call_record = self.llm(prompt)
+        return answer, call_record
+
 
 
 class RAGWithMetrics(RAGBase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.last_call: LLMCallRecord | None = None
+
 
     def llm(self, prompt):
         start_time = time.time()
         response = self._call_llm(prompt)
         response_time = time.time() - start_time
-        self._log_response(prompt, response, response_time)
-        return response.output_text
+        call_record = self._log_response(prompt, response, response_time)
+        return response.output_text, call_record
+
 
     def _call_llm(self, prompt):
         response = self.llm_client.responses.create(
@@ -87,6 +87,7 @@ class RAGWithMetrics(RAGBase):
             input=[{'role': 'user', 'content': prompt}]
         )
         return response
+
 
     def _log_response(self, prompt, response, response_time):
         usage = response.usage
@@ -100,20 +101,8 @@ class RAGWithMetrics(RAGBase):
             completion_tokens=usage.output_tokens,
             total_tokens=usage.total_tokens,
             response_time=response_time,
-            cost=cost,
+            cost=cost
         )
 
         print(call_record)
-        self.last_call = call_record
-
-
-if __name__ == '__main__':
-    docs = load_docs()
-    index = build_index(docs)
-    openai_client = OpenAI()
-
-    assistant = RAGBase(index=index, llm_client=openai_client)
-
-    question = "What is a pod?"
-    response = assistant.rag(question)
-    print(response)
+        return call_record

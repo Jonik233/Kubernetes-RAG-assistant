@@ -1,0 +1,7 @@
+data
+.DS_Store
+.idea
+scripts/.env
+ingestion/.env
+deployment/.env
+app/rag/.env

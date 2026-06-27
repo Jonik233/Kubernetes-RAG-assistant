@@ -1,0 +1,36 @@
+services:
+
+  db:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - rag-db:/var/lib/postgresql/data
+
+  rag-app:
+    build:
+      context: ../
+      dockerfile: deployment/Dockerfile
+    container_name: rag-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+
+volumes:
+  rag-db:
+  grafana_data:

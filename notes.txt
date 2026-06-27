@@ -1,0 +1,1 @@
+text-search eval based on minsearch library: {'hit_rate': 0.7083333333333334, 'mrr': 0.4478309523809524}
